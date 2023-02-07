@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SystemSales.Models;
+using SystemSales.Data;
 
 namespace SystemSales
 {
@@ -39,16 +40,20 @@ namespace SystemSales
             services.AddDbContext<SystemSalesContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("SystemSalesContext"), builder =>
                         builder.MigrationsAssembly("SystemSales")));
+
+            services.AddScoped<SeedingService>(); // Registro de serviço no sistema de injeção dependência  da aplicação
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, SeedingService seedingService)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment()) //Serviço de desenvolvimento
             {
                 app.UseDeveloperExceptionPage();
+                seedingService.Seed();
             }
-            else
+            else // se o aplicativo já tiver sido publicado
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
