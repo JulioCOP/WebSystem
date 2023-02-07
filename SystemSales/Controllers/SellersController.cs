@@ -11,6 +11,6 @@ namespace SystemSales.Controllers
         public IActionResult Index()
         {
             return View();
-        }
+        }   
     }
 }

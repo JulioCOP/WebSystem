@@ -19,7 +19,7 @@ namespace SystemSales.Controllers
         public IActionResult About()
         {
             ViewData["Message"] = "System Sales Online";
-            ViewData["Desenvolvedor: "] = "Júlio César Oliveira Pinto";
+            ViewData["Desenvolvedor"] = "Júlio César Oliveira Pinto";
 
             return View();
         }
