@@ -12,10 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SystemSales.Models;
 using SystemSales.Data;
+using SystemSales.Services;
 
 namespace SystemSales
 {
-    public class Startup
+    public class Startup // Sistema de injeção de dependência
     {
         public Startup(IConfiguration configuration)
         {
@@ -42,6 +43,7 @@ namespace SystemSales
                         builder.MigrationsAssembly("SystemSales")));
 
             services.AddScoped<SeedingService>(); // Registro de serviço no sistema de injeção dependência  da aplicação
+            services.AddScoped<SellerService>();
 
         }
 
