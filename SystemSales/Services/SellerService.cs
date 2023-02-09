@@ -23,5 +23,12 @@ namespace SystemSales.Services
         {
             return _context.Seller.ToList(); // retorna do banco de dados todos os vendedores
         }
+
+        // inserir um novo vendedor no banco de dados
+        public void InsertSeller(Seller obj)
+        {
+            _context.Add(obj);
+            _context.SaveChanges();
+        }
     }
 }
