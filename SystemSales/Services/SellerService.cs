@@ -27,6 +27,7 @@ namespace SystemSales.Services
         // inserir um novo vendedor no banco de dados
         public void InsertSeller(Seller obj)
         {
+            obj.Department = _context.Department.First();
             _context.Add(obj);
             _context.SaveChanges();
         }

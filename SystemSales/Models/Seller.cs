@@ -23,6 +23,8 @@ namespace SystemSales.Models
         public Department Department { get; set; }
 
         // Associaçã de 1 vendedor, possui pode possior varias vendas
+
+        public int DepartmentId{ get; set; }
         public ICollection<SalesRecord> Sales { get; set; } = new List<SalesRecord>();
 
         public Seller()
