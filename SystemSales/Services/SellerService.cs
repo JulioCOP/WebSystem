@@ -25,9 +25,8 @@ namespace SystemSales.Services
         }
 
         // inserir um novo vendedor no banco de dados
-        public void InsertSeller(Seller obj)
+        public void InsertSeller(Seller obj) //objeto Seller já está instanciado com departamento na classe SeriveDepartment
         {
-            obj.Department = _context.Department.First();
             _context.Add(obj);
             _context.SaveChanges();
         }

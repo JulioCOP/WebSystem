@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using SystemSales.Models;
 using SystemSales.Services;
+using SystemSales.Models.ViewModels;
+
 namespace SystemSales.Controllers
 {
     public class SellersController : Controller
@@ -12,9 +14,12 @@ namespace SystemSales.Controllers
         // Declarar uma dependência
         private readonly SellerService _sellerService;
 
-        public SellersController(SellerService sellerService)
+        private readonly ServiceDepartment _serviceDepartment;
+
+        public SellersController(SellerService sellerService, ServiceDepartment serviceDepartment)
         {
             _sellerService = sellerService;
+            _serviceDepartment = serviceDepartment;
         }
         public IActionResult Index()
         {
@@ -24,7 +29,12 @@ namespace SystemSales.Controllers
         
         public IActionResult Create()
         {
-            return View();
+            // atualizar o metodo para cadastrar o vendedor
+
+            var departments = _serviceDepartment.FindAll();
+            var viewModel = new SellerFormViewModel { Departments = departments };
+
+            return View(viewModel); // quando a tela de cadastro for acionada irá retornar com o objeto ViewModel
         }
 
         [HttpPost] //ação de post
