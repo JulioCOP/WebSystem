@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SystemSales.Models;
+using Microsoft.EntityFrameworkCore;
+using SystemSales.Services.Exceptions;
 
 namespace SystemSales.Services
 {
@@ -32,7 +34,7 @@ namespace SystemSales.Services
         }
         public Seller FindById(int id)
         {
-            return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
         }
         public void Remove(int id)
         {
@@ -40,5 +42,22 @@ namespace SystemSales.Services
             _context.Seller.Remove(obj); //remove do db set
             _context.SaveChanges(); // operação para o entitie framework confirmar remoção no banco de dados
         }
+        public void Update(Seller obj)
+        {
+            if (!_context.Seller.Any(x => x.Id == obj.Id)) // testando no banco de dados se há algum vendedor x, cujo o ID seja igual  ID do objeto 
+            {
+                throw new NotFoundException("The ID of this product could not be found");
+            }
+            try
+            {
+                _context.Update(obj);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DbConcurrencyException(e.Message);
+            }
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SystemSales.Models;
 using SystemSales.Services;
 using SystemSales.Models.ViewModels;
+using SystemSales.Services.Exceptions;
 
 namespace SystemSales.Controllers
 {
@@ -26,7 +27,7 @@ namespace SystemSales.Controllers
             var list = _sellerService.FindAll();
             return View(list);
         }
-        
+
         public IActionResult Create()
         {
             // atualizar o metodo para cadastrar o vendedor
@@ -47,11 +48,11 @@ namespace SystemSales.Controllers
         }
         public IActionResult Delete(int? id)
         {
-            if (id == null)
+            if (id == null) //Verifica se o ID é valido e se foi informado corretamente
             {
                 return NotFound();
             }
-            var obj = _sellerService.FindById(id.Value);
+            var obj = _sellerService.FindById(id.Value); //testa se o ID existe no banco de dados
             if (obj == null)
             {
                 return NotFound();
@@ -64,6 +65,58 @@ namespace SystemSales.Controllers
         {
             _sellerService.Remove(id);
             return RedirectToAction(nameof(Index)); // redirecionar para tela inicial de vendedores do CRUD
+        }
+        public IActionResult Details(int? id)
+        {
+            // Mesma lógica do metodo delete
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+            // busca o id do produto e qual objeto o mesmo se refere, para depois retornala-lo na view
+        }
+        public IActionResult Edit(int? id) //abrir uma nova tela para editar os dados dos vendedores
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            List<Department> departments = _serviceDepartment.FindAll();
+            SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
+            return View(viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            if (id != seller.Id)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                _sellerService.Update(seller);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch (DbConcurrencyException)
+            {
+                return BadRequest();
+            }
         }
     }
 }
