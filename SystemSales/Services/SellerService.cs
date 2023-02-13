@@ -25,10 +25,20 @@ namespace SystemSales.Services
         }
 
         // inserir um novo vendedor no banco de dados
-        public void InsertSeller(Seller obj) //objeto Seller já está instanciado com departamento na classe SeriveDepartment
+        public void InsertSeller(Seller obj) //objeto Seller já está instanciado com departamento na classe ServiceDepartment
         {
             _context.Add(obj);
             _context.SaveChanges();
+        }
+        public Seller FindById(int id)
+        {
+            return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+        }
+        public void Remove(int id)
+        {
+            var obj = _context.Seller.Find(id);
+            _context.Seller.Remove(obj); //remove do db set
+            _context.SaveChanges(); // operação para o entitie framework confirmar remoção no banco de dados
         }
     }
 }

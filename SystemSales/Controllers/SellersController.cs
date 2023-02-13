@@ -45,5 +45,25 @@ namespace SystemSales.Controllers
             // redireções a inserção para o index, onde será mostrado ao usuário
             return (RedirectToAction(nameof(Index))); //melhora a manutenção do sistema, mantendo o código atual
         }
+        public IActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _sellerService.Remove(id);
+            return RedirectToAction(nameof(Index)); // redirecionar para tela inicial de vendedores do CRUD
+        }
     }
 }
