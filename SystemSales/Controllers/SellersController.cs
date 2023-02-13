@@ -7,6 +7,7 @@ using SystemSales.Models;
 using SystemSales.Services;
 using SystemSales.Models.ViewModels;
 using SystemSales.Services.Exceptions;
+using System.Diagnostics;
 
 namespace SystemSales.Controllers
 {
@@ -50,12 +51,12 @@ namespace SystemSales.Controllers
         {
             if (id == null) //Verifica se o ID é valido e se foi informado corretamente
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
             var obj = _sellerService.FindById(id.Value); //testa se o ID existe no banco de dados
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
             }
             return View(obj);
         }
@@ -71,12 +72,12 @@ namespace SystemSales.Controllers
             // Mesma lógica do metodo delete
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
             }
             return View(obj);
             // busca o id do produto e qual objeto o mesmo se refere, para depois retornala-lo na view
@@ -85,12 +86,12 @@ namespace SystemSales.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
             var obj = _sellerService.FindById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
             }
             List<Department> departments = _serviceDepartment.FindAll();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
@@ -102,21 +103,33 @@ namespace SystemSales.Controllers
         {
             if (id != seller.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "ERROR!\nID DIFFERENT" });
+
             }
             try
             {
                 _sellerService.Update(seller);
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException)
+            catch (NotFoundException e)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
-            catch (DbConcurrencyException)
+            catch (DbConcurrencyException e)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
+        }
+        public IActionResult Error(string message)
+        {
+            // enviar uma requisição para mensagem de erro
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+                // pega o id interno da requisição
+            };
+            return View(viewModel);
         }
     }
 }
