@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using SystemSales.Models;
 using SystemSales.Data;
 using SystemSales.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace SystemSales
 {
@@ -52,6 +54,16 @@ namespace SystemSales
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, SeedingService seedingService)
         {
+            // LOCALE da aplcação definido como dos EUA
+            var enUS = new CultureInfo("en-US");
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(enUS), //locale padrão
+                SupportedCultures = new List<CultureInfo> { enUS }, // locales possíveis na aplicação
+                SupportedUICultures = new List<CultureInfo> { enUS }
+            };
+            app.UseRequestLocalization(localizationOptions);
+
             if (env.IsDevelopment()) //Serviço de desenvolvimento
             {
                 app.UseDeveloperExceptionPage();
