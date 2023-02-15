@@ -47,7 +47,7 @@ namespace SystemSales
             services.AddScoped<SeedingService>(); // Registro de serviço no sistema de injeção dependência  da aplicação
             services.AddScoped<SellerService>();
             services.AddScoped<ServiceDepartment>();
-
+            services.AddScoped<SalesRecordService>();
 
         }
 
