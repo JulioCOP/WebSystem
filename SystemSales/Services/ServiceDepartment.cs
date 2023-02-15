@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SystemSales.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SystemSales.Services
 {
@@ -14,9 +15,9 @@ namespace SystemSales.Services
             _context = context;
         }
         // Método para retornar todos os departamentos
-        public List<Department> FindAll()
+        public async Task<List<Department>>FindAllAsync()
         {
-            return _context.Department.OrderBy(x => x.Name).ToList();
+            return await _context.Department.OrderBy(x => x.Name).ToListAsync();
         }
     }
 }

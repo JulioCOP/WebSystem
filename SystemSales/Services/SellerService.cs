@@ -21,37 +21,38 @@ namespace SystemSales.Services
 
         // Operação FindAll para retornar todos os vendedores da lista do banco de dados
 
-        public List<Seller> FindAll()
+        public async Task<List<Seller>> FindAllAsync()
         {
-            return _context.Seller.ToList(); // retorna do banco de dados todos os vendedores
+            return await _context.Seller.ToListAsync(); // retorna do banco de dados todos os vendedores
         }
 
         // inserir um novo vendedor no banco de dados
-        public void InsertSeller(Seller obj) //objeto Seller já está instanciado com departamento na classe ServiceDepartment
+        public async Task InsertSellerAsync(Seller obj) //objeto Seller já está instanciado com departamento na classe ServiceDepartment
         {
             _context.Add(obj);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(); // acessa o banco
         }
-        public Seller FindById(int id)
+        public async Task<Seller>FindByIdAsync(int id)
         {
-            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
+            return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
         }
-        public void Remove(int id)
+        public async Task RemoveAsync(int id)
         {
-            var obj = _context.Seller.Find(id);
+            var obj = await _context.Seller.FindAsync(id);
             _context.Seller.Remove(obj); //remove do db set
-            _context.SaveChanges(); // operação para o entitie framework confirmar remoção no banco de dados
+            await _context.SaveChangesAsync(); // operação para o entitie framework confirmar remoção no banco de dados
         }
-        public void Update(Seller obj)
+        public async Task UpdateAsync(Seller obj)
         {
-            if (!_context.Seller.Any(x => x.Id == obj.Id)) // testando no banco de dados se há algum vendedor x, cujo o ID seja igual  ID do objeto 
+            bool hasAny = await _context.Seller.AnyAsync(x => x.Id == obj.Id);
+            if (!hasAny) // testando no banco de dados se há algum vendedor x, cujo o ID seja igual  ID do objeto 
             {
                 throw new NotFoundException("The ID of this product could not be found");
             }
             try
             {
                 _context.Update(obj);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException e)
             {

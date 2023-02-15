@@ -23,17 +23,17 @@ namespace SystemSales.Controllers
             _sellerService = sellerService;
             _serviceDepartment = serviceDepartment;
         }
-        public IActionResult Index()
+        public async Task<IActionResult>Index()
         {
-            var list = _sellerService.FindAll();
+            var list = await _sellerService.FindAllAsync();
             return View(list);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             // atualizar o metodo para cadastrar o vendedor
 
-            var departments = _serviceDepartment.FindAll();
+            var departments = await _serviceDepartment.FindAllAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
 
             return View(viewModel); // quando a tela de cadastro for acionada irá retornar com o objeto ViewModel
@@ -41,26 +41,26 @@ namespace SystemSales.Controllers
 
         [HttpPost] //ação de post
         [ValidateAntiForgeryToken]// previnir a aplicação de forer ataques CSR, através do aen
-        public IActionResult Create(Seller seller)
+        public async Task<IActionResult>Create(Seller seller)
         {
         // condição que não permite que a edição seja realizada sem que os campos sejam informads
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var departments = _serviceDepartment.FindAll(); // carrega os departamentos
+                var departments = await _serviceDepartment.FindAllAsync(); // carrega os departamentos
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
-            _sellerService.InsertSeller(seller);
+            await _sellerService.InsertSellerAsync(seller);
             // redireções a inserção para o index, onde será mostrado ao usuário
             return (RedirectToAction(nameof(Index))); //melhora a manutenção do sistema, mantendo o código atual
         }
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) //Verifica se o ID é valido e se foi informado corretamente
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
-            var obj = _sellerService.FindById(id.Value); //testa se o ID existe no banco de dados
+            var obj = await _sellerService.FindByIdAsync(id.Value); //testa se o ID existe no banco de dados
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
@@ -69,19 +69,19 @@ namespace SystemSales.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult>Delete(int id)
         {
-            _sellerService.Remove(id);
+            await _sellerService.RemoveAsync(id);
             return RedirectToAction(nameof(Index)); // redirecionar para tela inicial de vendedores do CRUD
         }
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             // Mesma lógica do metodo delete
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
@@ -89,28 +89,28 @@ namespace SystemSales.Controllers
             return View(obj);
             // busca o id do produto e qual objeto o mesmo se refere, para depois retornala-lo na view
         }
-        public IActionResult Edit(int? id) //abrir uma nova tela para editar os dados dos vendedores
+        public async Task<IActionResult>Edit(int? id) //abrir uma nova tela para editar os dados dos vendedores
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT INFORMED" });
             }
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID NOT FOUND" });
             }
-            List<Department> departments = _serviceDepartment.FindAll();
+            List<Department> departments = await _serviceDepartment.FindAllAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
             return View(viewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public async Task<IActionResult>Edit(int id, Seller seller)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var departments = _serviceDepartment.FindAll(); // carrega os departamentos
+                var departments = await _serviceDepartment.FindAllAsync(); // carrega os departamentos
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
@@ -122,7 +122,7 @@ namespace SystemSales.Controllers
             }
             try
             {
-                _sellerService.Update(seller);
+                await _sellerService.UpdateAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
             catch (NotFoundException e)
