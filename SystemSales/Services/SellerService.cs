@@ -32,15 +32,22 @@ namespace SystemSales.Services
             _context.Add(obj);
             await _context.SaveChangesAsync(); // acessa o banco
         }
-        public async Task<Seller>FindByIdAsync(int id)
+        public async Task<Seller> FindByIdAsync(int id)
         {
             return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
         }
         public async Task RemoveAsync(int id)
         {
-            var obj = await _context.Seller.FindAsync(id);
-            _context.Seller.Remove(obj); //remove do db set
-            await _context.SaveChangesAsync(); // operação para o entitie framework confirmar remoção no banco de dados
+            try
+            {
+                var obj = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(obj); //remove do db set
+                await _context.SaveChangesAsync(); // operação para o entitie framework confirmar remoção no banco de dados
+            }
+            catch (DbUpdateException)
+            {
+                throw new IntegrityException("You must delete all sales from this seller in so that he or she is exclued from the system");
+            }
         }
         public async Task UpdateAsync(Seller obj)
         {
@@ -59,6 +66,6 @@ namespace SystemSales.Services
                 throw new DbConcurrencyException(e.Message);
             }
         }
-
     }
 }
+

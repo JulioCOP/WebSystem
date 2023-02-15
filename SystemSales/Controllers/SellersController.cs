@@ -23,7 +23,7 @@ namespace SystemSales.Controllers
             _sellerService = sellerService;
             _serviceDepartment = serviceDepartment;
         }
-        public async Task<IActionResult>Index()
+        public async Task<IActionResult> Index()
         {
             var list = await _sellerService.FindAllAsync();
             return View(list);
@@ -41,9 +41,9 @@ namespace SystemSales.Controllers
 
         [HttpPost] //ação de post
         [ValidateAntiForgeryToken]// previnir a aplicação de forer ataques CSR, através do aen
-        public async Task<IActionResult>Create(Seller seller)
+        public async Task<IActionResult> Create(Seller seller)
         {
-        // condição que não permite que a edição seja realizada sem que os campos sejam informads
+            // condição que não permite que a edição seja realizada sem que os campos sejam informads
             if (!ModelState.IsValid)
             {
                 var departments = await _serviceDepartment.FindAllAsync(); // carrega os departamentos
@@ -69,10 +69,17 @@ namespace SystemSales.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _sellerService.RemoveAsync(id);
-            return RedirectToAction(nameof(Index)); // redirecionar para tela inicial de vendedores do CRUD
+            try
+            {
+                await _sellerService.RemoveAsync(id);
+                return RedirectToAction(nameof(Index)); // redirecionar para tela inicial de vendedores do CRUD
+            }
+            catch (IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
         }
         public async Task<IActionResult> Details(int? id)
         {
@@ -89,7 +96,7 @@ namespace SystemSales.Controllers
             return View(obj);
             // busca o id do produto e qual objeto o mesmo se refere, para depois retornala-lo na view
         }
-        public async Task<IActionResult>Edit(int? id) //abrir uma nova tela para editar os dados dos vendedores
+        public async Task<IActionResult> Edit(int? id) //abrir uma nova tela para editar os dados dos vendedores
         {
             if (id == null)
             {
@@ -106,7 +113,7 @@ namespace SystemSales.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>Edit(int id, Seller seller)
+        public async Task<IActionResult> Edit(int id, Seller seller)
         {
             if (!ModelState.IsValid)
             {
@@ -114,7 +121,7 @@ namespace SystemSales.Controllers
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
-            
+
             if (id != seller.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID DIFFERENT" });
