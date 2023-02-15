@@ -43,6 +43,13 @@ namespace SystemSales.Controllers
         [ValidateAntiForgeryToken]// previnir a aplicação de forer ataques CSR, através do aen
         public IActionResult Create(Seller seller)
         {
+        // condição que não permite que a edição seja realizada sem que os campos sejam informads
+            if (ModelState.IsValid)
+            {
+                var departments = _serviceDepartment.FindAll(); // carrega os departamentos
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
             _sellerService.InsertSeller(seller);
             // redireções a inserção para o index, onde será mostrado ao usuário
             return (RedirectToAction(nameof(Index))); //melhora a manutenção do sistema, mantendo o código atual
@@ -101,6 +108,13 @@ namespace SystemSales.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
+            if (ModelState.IsValid)
+            {
+                var departments = _serviceDepartment.FindAll(); // carrega os departamentos
+                var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
+            
             if (id != seller.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "ERROR!\nID DIFFERENT" });
